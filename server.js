@@ -1,5 +1,6 @@
 var http = require("http");
 var fs = require('fs');
+var step = require("step");
 
 http.createServer(function(request, response) {
     if (request.url === "/favicon.ico") {
@@ -8,26 +9,42 @@ http.createServer(function(request, response) {
         return;
     }
     
-    response.writeHead(200, { "Content-Type": "text/html", "X-FOO": "BAR" });  
-    var filename = 'counter.txt';  
-    readFile(filename, function(counter) {
-        counter++;
-        writeFile(filename, counter, function() {
+    var filename = 'counter.txt';
+    
+    step (        
+        function() {
+            response.writeHead(200, { "Content-Type": "text/html", "X-FOO": "BAR" });
+            return true;
+        },
+        
+        function(err) {
+            readFile(filename, this);            
+        },
+        
+        function(err, counter) {
+            counter++;
+            return counter;
+        },
+        
+        function(err, counter) {
+            writeFile(filename, counter, this);            
+        },
+        
+        function(err, counter) {
             response.end("<html><body>" + counter + "</body></html>");
-        })
-    });
+        }
+    );
+    
 }).listen(1337);
 
 function readFile(filename, callback) {
     fs.readFile(filename, function (err, data) {
-        if (err) throw err;
-        callback(parseInt(data));
+        callback(err, parseInt(data));
     }); 
 }
 
 function writeFile(filename, data, callback) {
     fs.writeFile(filename, data, function (err) {
-        if (err) throw err;
-        callback();
+        callback(err, data);
     });
 }

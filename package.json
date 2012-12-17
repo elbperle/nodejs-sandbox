@@ -1,0 +1,13 @@
+{
+  "author": "Svenja Hinsch",
+  "name": "svenja-website",
+  "version": "0.0.0",
+  "dependencies": {
+      "step": "0.0.5"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
